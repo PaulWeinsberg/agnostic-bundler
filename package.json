@@ -1,0 +1,34 @@
+{
+  "name": "@lorndev/agnostic-bundler",
+  "version": "5.0.1",
+  "description": "A simple bundler for CMS which use simple assets stack",
+  "main": "bin/agnostic-bundler.js",
+  "repository": "PaulWeinsberg/agnostic-bundler",
+  "author": "Paul Weinsberg <p.weinsberg@icloud.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/browser-sync": "^2.26.3",
+    "@types/fs-extra": "^9.0.13",
+    "@types/glob": "^7.2.0",
+    "@types/postcss-inline-svg": "^5.0.0",
+    "arg": "^5.0.1",
+    "autoprefixer": "^10.4.0",
+    "browser-sync": "^2.27.7",
+    "colors": "^1.4.0",
+    "esbuild": "^0.14.8",
+    "fs-extra": "^10.0.0",
+    "glob": "^7.2.0",
+    "postcss": "^8.4.5",
+    "postcss-inline-svg": "^5.0.0",
+    "precinct": "^8.3.0",
+    "sass": "^1.45.1",
+    "ts-node": "^10.4.0"
+  },
+  "scripts": {
+    "build": "ts-node esbuild.ts --production",
+    "dev": "ts-node esbuild.ts --sourcemap --watch"
+  },
+  "bin": {
+    "agnostic-bundler": "./agnostic-bundler.js"
+  }
+}

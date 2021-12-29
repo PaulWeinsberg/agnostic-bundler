@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+lib/**
+
+# Test env
+build
+public
+distribution
+
+# Keep folders
+!.gitkeep

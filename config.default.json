@@ -1,0 +1,24 @@
+{
+  "src": "public",
+  "dist": "build",
+  "vendors": ["distribution"],
+  "compileExtensions": [".js",".ts",".scss"],
+  "exclude": "/(node_modules|bower_components)/",
+  "browserSync": {
+    "host": "localhost",
+    "proxy": "vanksen.docksal",
+    "port": 4200,
+    "ui": { "port": 4201 },
+    "open": false,
+    "socket": {
+      "domain": "localhost:4200"
+    },
+    "injectChanges": true
+  },
+  "sass": {
+    "loadPaths": ["distribution/sass", "node_modules"]
+  },
+  "copy": {
+    "ignore": [".ts",".js",".scss",".gitkeep"]
+  }
+}
