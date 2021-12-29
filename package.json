@@ -29,6 +29,6 @@
     "dev": "ts-node esbuild.ts --sourcemap --watch"
   },
   "bin": {
-    "agnostic-bundler": "./agnostic-bundler.js"
+    "agnostic-bundler": "./bin/agnostic-bundler.js"
   }
 }
