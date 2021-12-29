@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "target": "es6",
+    "target": "ES6",
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "sourceMap": true
+    "outDir": "bin"
   },
-  "include": [
-    "**/*"
-  ],
+  "include": ["agnostic-bundler.ts"],
   "exclude": [
     "node_modules",
     "**/*.spec.ts"

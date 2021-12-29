@@ -21,7 +21,7 @@ const args = arg({
   '--production': Boolean
 });
 
-let Config = JSON.parse(fs.readFileSync(`${__dirname}/config.default.json`,{ encoding: 'utf-8' }));
+let Config = JSON.parse(fs.readFileSync(`${__dirname}/../config.default.json`,{ encoding: 'utf-8' }));
 if (fs.existsSync('config.json')) {
   Config = JSON.parse(fs.readFileSync('config.json',{ encoding: 'utf-8' }))
 }
