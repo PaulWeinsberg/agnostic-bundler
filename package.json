@@ -1,6 +1,6 @@
 {
   "name": "@lorndev/agnostic-bundler",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple bundler for CMS which use simple assets stack",
   "main": "bin/agnostic-bundler.js",
   "repository": "PaulWeinsberg/agnostic-bundler",
