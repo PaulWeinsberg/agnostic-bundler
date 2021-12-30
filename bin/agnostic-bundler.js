@@ -126,7 +126,7 @@ const copyTask = async (entries) => {
 const removeSourcemap = async () => {
     const files = glob.sync(`${dist}/**/*.map`);
     for (const file of files)
-        await fs.rm(file);
+        await fs.unlink(file);
 };
 const watchSass = async (entry) => {
     let rebuildableEntries = [];
