@@ -13,7 +13,16 @@
     "socket": {
       "domain": "localhost:4200"
     },
-    "injectChanges": true
+    "injectChanges": true,
+    "watchEvents": ["change"],
+    "files": [
+      "build/**/*.js",
+      "build/**/*.css"
+    ],
+    "ignore": "build/some-pattern",
+    "watchOptions": {
+      "usePolling": true
+    }
   },
   "sass": {
     "loadPaths": ["distribution/sass", "node_modules"]

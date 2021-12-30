@@ -199,8 +199,7 @@ const watchHandler = async (entry: string) => {
       fs.watchFile(entry, { interval: 1000, persistent: true }, watchHandler.bind(this, entry));
     }
 
-    const bs = browserSync.init({ ...Config.browserSync });
-    bs.watch(`${dist}/**/*.*`, { usePolling: true }).on('change', bs.reload);
+    browserSync.init({ ...Config.browserSync });
 
   }
 
