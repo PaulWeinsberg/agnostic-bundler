@@ -10,6 +10,7 @@ import postcss from 'postcss';
 import * as autoprefixer from 'autoprefixer';
 import * as postcssInlineSvg from 'postcss-inline-svg';
 import * as browserSync from 'browser-sync';
+import { ESLint } from 'eslint';
 // @ts-ignore
 import * as precinct from 'precinct';
 import * as arg from 'arg'
@@ -18,6 +19,7 @@ import * as arg from 'arg'
 let state: 'build'|'watch'|'init' = 'init';
 const detective = precinct.paperwork;
 const args = arg({
+  '--lint': Boolean,
   '--watch': Boolean,
   '--sourcemap': Boolean,
   '--production': Boolean
@@ -35,7 +37,7 @@ const entries: string[] = [];
 
 const sources = path.resolve(Config.src);
 const dist = path.resolve(Config.dist);
-const vendors = (Config.vendors as string[]).map(vendor => path.resolve(vendor));
+const vendors = (Config.vendors as string[] ?? []).map(vendor => path.resolve(vendor));
 
 (Config.compileExtensions as string[]).forEach(ext => {
   vendors.forEach(vendor => {
@@ -63,15 +65,23 @@ const sassDependencies: { entry: string; urls: string[] }[] = [];
 const esbuildDependencies: { entry: string; urls: string[] }[] = [];
 
 const build = async (esbuildEntries?: string[], sassEntries?: string[], copyEntries?: string[]) => {
-  state = 'build';
+  let lintError = false;
 
+  state = 'build';
   console.time('Build duration');
   console.log(colors.black(colors.bgCyan('\n--- Starting build ---\n')));
 
-  if (esbuildEntries) await esbuildTask(esbuildEntries);
-  if (sassEntries) await sassTask(sassEntries);
-  if (copyEntries) await copyTask(copyEntries);
-  if (args['--production']) await removeSourcemap();
+  if (args['--lint'] && await eslintTask()) {
+    console.log(colors.bgRed(colors.black('Error found in your dependencies, fix them or disable eslint by removing --lint flag to build.\n')));
+    lintError = true;
+  }
+
+  if (!lintError) {
+    if (esbuildEntries) await esbuildTask(esbuildEntries);
+    if (sassEntries) await sassTask(sassEntries);
+    if (copyEntries) await copyTask(copyEntries);
+    if (args['--production']) await removeSourcemap();
+  }
 
   console.log(colors.black(colors.bgCyan('\n--- Build finished ---\n')));
   console.timeEnd('Build duration');
@@ -83,7 +93,7 @@ const build = async (esbuildEntries?: string[], sassEntries?: string[], copyEntr
 }
 
 const esbuildTask = async (entries: string[]) => {
-  console.log(colors.green('esbuild compiling...'));
+  console.log(colors.green('→ esbuild compiling...'));
   const options = {
     entryPoints: entries,
     bundle: true,
@@ -92,7 +102,8 @@ const esbuildTask = async (entries: string[]) => {
     minify: true,
     outbase: sources,
     preserveSymlinks: true,
-    sourcemap: args['--sourcemap']
+    sourcemap: args['--sourcemap'],
+    ...(Config.esbuild ?? {})
   }
 
   for (const file of entries) {
@@ -108,13 +119,13 @@ const esbuildTask = async (entries: string[]) => {
 }
 
 const sassTask = async (entries: string []) => {
-  console.log(colors.green('sass compiling...'));
+  console.log(colors.green('→ sass compiling...'));
 
   for (const file of entries) {
     let { css, sourceMap, loadedUrls } = sass.compile(file, {
       style: 'compressed',
       sourceMap: args['--sourcemap'],
-      ...Config.sass
+      ...(Config.sass ?? {})
     });
 
     css = (await postcss([
@@ -137,7 +148,7 @@ const sassTask = async (entries: string []) => {
 }
 
 const copyTask = async (entries: string[]) => {
-  console.log(colors.green('copying other files...'));
+  console.log(colors.green('→ copying other files...'));
 
   for (const file of entries) {
     let copyDist = file.replace(sources, dist);
@@ -147,8 +158,28 @@ const copyTask = async (entries: string[]) => {
 }
 
 const removeSourcemap = async () => {
+  console.log(colors.green('→ removing sourcemaps...'));
+
   const files = glob.sync(`${dist}/**/*.map`);
   for (const file of files) await fs.unlink(file);
+}
+
+const eslintTask = async (): Promise<boolean> => {
+  console.log(colors.green('→ checking script syntax...'));
+
+  const eslint = new ESLint((Config.eslint?.config ?? {}));
+  const results = await eslint.lintFiles(
+    entries.filter(entry => entry.match(new RegExp(`\.(${(Config.lintedExtensions ?? []).join('|')})$`)))
+  );
+  const formater = await eslint.loadFormatter('stylish');
+
+  console.log(formater.format(results));
+
+  return results.some(result => (
+    result.errorCount +
+    result.fatalErrorCount +
+    result.fixableErrorCount
+  ));
 }
 
 const watchSass = async (entry: string) => {
@@ -199,7 +230,7 @@ const watchHandler = async (entry: string) => {
       fs.watchFile(entry, { interval: 1000, persistent: true }, watchHandler.bind(this, entry));
     }
 
-    browserSync.init({ ...Config.browserSync });
+    browserSync.init(Config.browserSync ?? {});
 
   }
 
