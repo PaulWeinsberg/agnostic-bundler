@@ -88,7 +88,7 @@ const build = async (esbuildEntries?: string[], sassEntries?: string[], copyEntr
 
   if (args['--watch']) setTimeout(() => {
     state = 'watch'
-    console.log(colors.green('\nWatching file changes...\n'));
+    console.log(colors.green('\nWatching file changes...'));
   }, 1000);
 }
 

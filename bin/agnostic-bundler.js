@@ -80,7 +80,7 @@ const build = async (esbuildEntries, sassEntries, copyEntries) => {
     if (args['--watch'])
         setTimeout(() => {
             state = 'watch';
-            console.log(colors.green('\nWatching file changes...\n'));
+            console.log(colors.green('\nWatching file changes...'));
         }, 1000);
 };
 const esbuildTask = async (entries) => {
@@ -138,7 +138,8 @@ const eslintTask = async () => {
     const eslint = new eslint_1.ESLint(((_b = (_a = Config.eslint) === null || _a === void 0 ? void 0 : _a.config) !== null && _b !== void 0 ? _b : {}));
     const results = await eslint.lintFiles(entries.filter(entry => { var _a; return entry.match(new RegExp(`\.(${((_a = Config.lintedExtensions) !== null && _a !== void 0 ? _a : []).join('|')})$`)); }));
     const formater = await eslint.loadFormatter('stylish');
-    console.log(formater.format(results));
+    if (results.length)
+        console.log(formater.format(results));
     return results.some(result => (result.errorCount +
         result.fatalErrorCount +
         result.fixableErrorCount));
