@@ -172,8 +172,8 @@ const eslintTask = async (): Promise<boolean> => {
     entries.filter(entry => entry.match(new RegExp(`\.(${(Config.lintedExtensions ?? []).join('|')})$`)))
   );
   const formater = await eslint.loadFormatter('stylish');
-
-  if (results.length) console.log(formater.format(results));
+  const output = formater.format(results);
+  if (output.length) console.log(output);
 
   return results.some(result => (
     result.errorCount +
@@ -193,7 +193,9 @@ const watchSass = async (entry: string) => {
 
 const watchEsbuild = async (entry: string) => {
   let rebuildableEntries = [];
-  rebuildableEntries = esbuildDependencies.filter(dep => (dep.urls.includes(entry) || dep.urls.includes(entry.replace(/\..*$/, '')))).map(dep => dep.entry);
+  rebuildableEntries = esbuildDependencies.filter(dep => (
+    dep.urls.includes(entry) || dep.urls.includes(entry.substr(0, entry.lastIndexOf('.')))
+  )).map(dep => dep.entry);
 
   for (const entry of rebuildableEntries) console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);
 
@@ -203,7 +205,7 @@ const watchEsbuild = async (entry: string) => {
 const watchHandler = async (entry: string) => {
   if (state === 'build') return;
 
-  console.log(`\n${colors.magenta('Change detected in : ')}${entry.replace(path.resolve(Config.src), '')}\n`);
+  console.log(`\n${colors.magenta('Change detected in : ')}${entry.replace(path.resolve(Config.src), '')}`);
 
   if (compiledEntries.includes(entry)) {
 
