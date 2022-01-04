@@ -173,7 +173,7 @@ const eslintTask = async (): Promise<boolean> => {
   );
   const formater = await eslint.loadFormatter('stylish');
 
-  console.log(formater.format(results));
+  if (results.length) console.log(formater.format(results));
 
   return results.some(result => (
     result.errorCount +

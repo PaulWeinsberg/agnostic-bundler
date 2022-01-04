@@ -7,11 +7,6 @@
   "author": "Paul Weinsberg <p.weinsberg@icloud.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/browser-sync": "^2.26.3",
-    "@types/eslint": "^8.2.1",
-    "@types/fs-extra": "^9.0.13",
-    "@types/glob": "^7.2.0",
-    "@types/postcss-inline-svg": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.8.1",
     "@typescript-eslint/parser": "^5.8.1",
     "arg": "^5.0.1",
@@ -32,7 +27,15 @@
     "precinct": "^8.3.0",
     "react": "^17.0.2",
     "sass": "^1.45.1",
-    "ts-node": "^10.4.0"
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/browser-sync": "^2.26.3",
+    "@types/eslint": "^8.2.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/glob": "^7.2.0",
+    "@types/postcss-inline-svg": "^5.0.0"
   },
   "scripts": {
     "build": "ts-node esbuild.ts --production",
