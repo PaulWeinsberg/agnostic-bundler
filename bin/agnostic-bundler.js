@@ -145,18 +145,21 @@ const eslintTask = async () => {
         result.fatalErrorCount +
         result.fixableErrorCount));
 };
+const queueAddMessage = (entry) => {
+    console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);
+};
 const watchSass = async (entry) => {
     let rebuildableEntries = [];
     rebuildableEntries = sassDependencies.filter(dep => dep.urls.includes(entry)).map(dep => dep.entry);
     for (const entry of rebuildableEntries)
-        console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);
+        queueAddMessage(entry);
     await build(null, rebuildableEntries);
 };
 const watchEsbuild = async (entry) => {
     let rebuildableEntries = [];
     rebuildableEntries = esbuildDependencies.filter(dep => (dep.urls.includes(entry) || dep.urls.includes(entry.substr(0, entry.lastIndexOf('.'))))).map(dep => dep.entry);
     for (const entry of rebuildableEntries)
-        console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);
+        queueAddMessage(entry);
     await build(rebuildableEntries);
 };
 const watchHandler = async (entry) => {
@@ -164,6 +167,7 @@ const watchHandler = async (entry) => {
         return;
     console.log(`\n${colors.magenta('Change detected in : ')}${entry.replace(path.resolve(Config.src), '')}`);
     if (compiledEntries.includes(entry)) {
+        queueAddMessage(entry);
         sassEntries.includes(entry) ? await build(null, [entry]) : await build([entry]);
     }
     else if (entry.match(/\.scss$/)) {
