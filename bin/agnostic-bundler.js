@@ -24,9 +24,8 @@ const args = arg({
     '--production': Boolean
 });
 let Config = JSON.parse(fs.readFileSync(`${__dirname}/../config.default.json`, { encoding: 'utf-8' }));
-if (fs.existsSync('config.json')) {
+if (fs.existsSync('config.json'))
     Config = JSON.parse(fs.readFileSync('config.json', { encoding: 'utf-8' }));
-}
 const copyEntries = [];
 const compiledEntries = [];
 const vendorsEntries = [];
@@ -57,15 +56,12 @@ const esbuildEntries = compiledEntries.filter(file => !sassEntries.includes(file
 const sassDependencies = [];
 const esbuildDependencies = [];
 const build = async (esbuildEntries, sassEntries, copyEntries) => {
-    let lintError = false;
     state = 'build';
     console.time('Build duration');
     console.log(colors.black(colors.bgCyan('\n--- Starting build ---\n')));
-    if (args['--lint'] && await eslintTask()) {
-        console.log(colors.bgRed(colors.black('Error found in your dependencies, fix them or disable eslint by removing --lint flag to build.\n')));
-        lintError = true;
-    }
-    if (!lintError) {
+    try {
+        if (args['--lint'])
+            await eslintTask();
         if (esbuildEntries)
             await esbuildTask(esbuildEntries);
         if (sassEntries)
@@ -74,9 +70,16 @@ const build = async (esbuildEntries, sassEntries, copyEntries) => {
             await copyTask(copyEntries);
         if (args['--production'])
             await removeSourcemap();
+        console.log(colors.black(colors.bgCyan('\n--- Build finished ---\n')));
+        console.timeEnd('Build duration');
     }
-    console.log(colors.black(colors.bgCyan('\n--- Build finished ---\n')));
-    console.timeEnd('Build duration');
+    catch (err) {
+        console.log(err);
+        console.log(colors.bgRed(colors.black('\n--- Build failed ---\n')));
+        console.timeEnd('Build duration');
+        if (!args['--watch'])
+            process.exit(1);
+    }
     if (args['--watch'])
         setTimeout(() => {
             state = 'watch';
@@ -141,9 +144,11 @@ const eslintTask = async () => {
     const output = formater.format(results);
     if (output.length)
         console.log(output);
-    return results.some(result => (result.errorCount +
+    const hasError = results.some(result => (result.errorCount +
         result.fatalErrorCount +
         result.fixableErrorCount));
+    if (hasError)
+        throw Error('Some lint errors were found in your dependencies.');
 };
 const queueAddMessage = (entry) => {
     console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);

@@ -20,6 +20,7 @@
       "parser": "@typescript-eslint/parser",
       "plugins": ["@typescript-eslint"],
       "rules": {
+        "@typescript-eslint/no-extra-semi": "warn",
         "@typescript-eslint/adjacent-overload-signatures": "warn",
         "@typescript-eslint/ban-ts-comment": "warn",
         "@typescript-eslint/consistent-type-assertions": "warn",

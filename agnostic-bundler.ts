@@ -26,9 +26,7 @@ const args = arg({
 });
 
 let Config = JSON.parse(fs.readFileSync(`${__dirname}/../config.default.json`,{ encoding: 'utf-8' }));
-if (fs.existsSync('config.json')) {
-  Config = JSON.parse(fs.readFileSync('config.json',{ encoding: 'utf-8' }))
-}
+if (fs.existsSync('config.json')) Config = JSON.parse(fs.readFileSync('config.json',{ encoding: 'utf-8' }));
 
 const copyEntries: string[] = [];
 const compiledEntries: string[] = [];
@@ -65,32 +63,34 @@ const sassDependencies: { entry: string; urls: string[] }[] = [];
 const esbuildDependencies: { entry: string; urls: string[] }[] = [];
 
 const build = async (esbuildEntries?: string[], sassEntries?: string[], copyEntries?: string[]) => {
-  let lintError = false;
 
   state = 'build';
   console.time('Build duration');
   console.log(colors.black(colors.bgCyan('\n--- Starting build ---\n')));
 
-  if (args['--lint'] && await eslintTask()) {
-    console.log(colors.bgRed(colors.black('Error found in your dependencies, fix them or disable eslint by removing --lint flag to build.\n')));
-    lintError = true;
-  }
-
-  if (!lintError) {
+  try {
+    if (args['--lint']) await eslintTask();
     if (esbuildEntries) await esbuildTask(esbuildEntries);
     if (sassEntries) await sassTask(sassEntries);
     if (copyEntries) await copyTask(copyEntries);
     if (args['--production']) await removeSourcemap();
-  }
 
-  console.log(colors.black(colors.bgCyan('\n--- Build finished ---\n')));
-  console.timeEnd('Build duration');
+    console.log(colors.black(colors.bgCyan('\n--- Build finished ---\n')));
+    console.timeEnd('Build duration');
+
+  } catch (err) {
+    console.log(err);
+    console.log(colors.bgRed(colors.black('\n--- Build failed ---\n')));
+    console.timeEnd('Build duration');
+
+    if (!args['--watch']) process.exit(1);
+  }
 
   if (args['--watch']) setTimeout(() => {
     state = 'watch'
     console.log(colors.green('\nWatching file changes...'));
   }, 1000);
-}
+};
 
 const esbuildTask = async (entries: string[]) => {
   console.log(colors.green('→ esbuild compiling...'));
@@ -116,7 +116,7 @@ const esbuildTask = async (entries: string[]) => {
   }
 
   await esbuild.build(options);
-}
+};
 
 const sassTask = async (entries: string []) => {
   console.log(colors.green('→ sass compiling...'));
@@ -145,7 +145,7 @@ const sassTask = async (entries: string []) => {
       urls: loadedUrls.map(({ pathname }) => pathname)
     });
   }
-}
+};
 
 const copyTask = async (entries: string[]) => {
   console.log(colors.green('→ copying other files...'));
@@ -162,9 +162,9 @@ const removeSourcemap = async () => {
 
   const files = glob.sync(`${dist}/**/*.map`);
   for (const file of files) await fs.unlink(file);
-}
+};
 
-const eslintTask = async (): Promise<boolean> => {
+const eslintTask = async (): Promise<void> => {
   console.log(colors.green('→ checking script syntax...'));
 
   const eslint = new ESLint((Config.eslint?.config ?? {}));
@@ -175,16 +175,18 @@ const eslintTask = async (): Promise<boolean> => {
   const output = formater.format(results);
   if (output.length) console.log(output);
 
-  return results.some(result => (
+  const hasError = results.some(result => (
     result.errorCount +
     result.fatalErrorCount +
     result.fixableErrorCount
   ));
-}
+
+  if (hasError) throw Error('Some lint errors were found in your dependencies.');
+};
 
 const queueAddMessage = (entry: string): void => {
   console.log(`${colors.yellow('Added to the queue : ')}${entry.replace(path.resolve(Config.src), '')}`);
-}
+};
 
 const watchSass = async (entry: string) => {
   let rebuildableEntries = [];
@@ -193,7 +195,7 @@ const watchSass = async (entry: string) => {
   for (const entry of rebuildableEntries) queueAddMessage(entry);
 
   await build(null, rebuildableEntries);
-}
+};
 
 const watchEsbuild = async (entry: string) => {
   let rebuildableEntries = [];
@@ -204,7 +206,7 @@ const watchEsbuild = async (entry: string) => {
   for (const entry of rebuildableEntries) queueAddMessage(entry);
 
   await build(rebuildableEntries);
-}
+};
 
 const watchHandler = async (entry: string) => {
   if (state === 'build') return;
@@ -225,7 +227,7 @@ const watchHandler = async (entry: string) => {
     await watchEsbuild(entry);
 
   }
-}
+};
 
 (async () => {
 
