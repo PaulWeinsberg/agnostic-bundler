@@ -33,6 +33,8 @@ const compiledEntries: string[] = [];
 const vendorsEntries: string[] = [];
 const entries: string[] = [];
 
+const outputFiles: string[] = [];
+
 const sources = path.resolve(Config.src);
 const dist = path.resolve(Config.dist);
 const vendors = (Config.vendors as string[] ?? []).map(vendor => path.resolve(vendor));
@@ -65,6 +67,8 @@ const esbuildDependencies: { entry: string; urls: string[] }[] = [];
 const build = async (esbuildEntries?: string[], sassEntries?: string[], copyEntries?: string[]) => {
 
   state = 'build';
+  outputFiles.splice(0, outputFiles.length);
+
   console.time('Build duration');
   console.log(colors.black(colors.bgCyan('\n--- Starting build ---\n')));
 
@@ -115,6 +119,8 @@ const esbuildTask = async (entries: string[]) => {
     });
   }
 
+  outputFiles.push(...entries.map(file => file.replace(/\.(jsx?|tsx?)$/, '.js').replace(sources, dist)));
+
   await esbuild.build(options);
 };
 
@@ -137,8 +143,10 @@ const sassTask = async (entries: string []) => {
       css += `\n/*# sourceMappingURL=${file.replace(/^.*[\\\/]/, '').replace('.scss', '.css.map')} */`
       await fs.outputFile(file.replace(sources, dist).replace('.scss', '.css.map'), JSON.stringify(sourceMap), { encoding: 'utf8' });
     }
+    const outfile = file.replace(sources, dist).replace('.scss', '.css');
+    outputFiles.push(outfile);
 
-    await fs.outputFile(file.replace(sources, dist).replace('.scss', '.css'), css, { encoding: 'utf8' });
+    await fs.outputFile(outfile, css, { encoding: 'utf8' });
 
     if (!sassDependencies.some(({ entry }) => entry === file)) sassDependencies.push({
       entry: file,
@@ -160,7 +168,7 @@ const copyTask = async (entries: string[]) => {
 const removeSourcemap = async () => {
   console.log(colors.green('→ removing sourcemaps...'));
 
-  const files = glob.sync(`${dist}/**/*.map`);
+  const files = glob.sync(`${dist}/**/*.map`).filter(file => outputFiles.includes(file.substr(0, file.lastIndexOf('.'))));
   for (const file of files) await fs.unlink(file);
 };
 
