@@ -146,8 +146,8 @@ const eslintTask = async () => {
     const eslint = new eslint_1.ESLint(((_b = (_a = Config.eslint) === null || _a === void 0 ? void 0 : _a.config) !== null && _b !== void 0 ? _b : {}));
     const results = await eslint.lintFiles(entries.filter(entry => { var _a; return entry.match(new RegExp(`\.(${((_a = Config.lintedExtensions) !== null && _a !== void 0 ? _a : []).join('|')})$`)); }));
     const formater = await eslint.loadFormatter('stylish');
-    const output = formater.format(results);
-    if (output.length)
+    const output = await formater.format(results);
+    if (output)
         console.log(output);
     const hasError = results.some(result => (result.errorCount +
         result.fatalErrorCount +

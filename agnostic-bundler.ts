@@ -180,8 +180,8 @@ const eslintTask = async (): Promise<void> => {
     entries.filter(entry => entry.match(new RegExp(`\.(${(Config.lintedExtensions ?? []).join('|')})$`)))
   );
   const formater = await eslint.loadFormatter('stylish');
-  const output = formater.format(results);
-  if (output.length) console.log(output);
+  const output = await formater.format(results);
+  if (output) console.log(output);
 
   const hasError = results.some(result => (
     result.errorCount +
