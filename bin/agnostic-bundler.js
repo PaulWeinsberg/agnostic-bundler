@@ -93,7 +93,7 @@ const esbuildTask = async (entries) => {
     console.log(colors.green('→ esbuild compiling...'));
     const options = Object.assign({ entryPoints: entries, bundle: true, write: true, outdir: dist, minify: true, outbase: sources, preserveSymlinks: true, sourcemap: args['--sourcemap'] }, ((_a = Config.esbuild) !== null && _a !== void 0 ? _a : {}));
     for (const file of entries) {
-        const deps = detective(file).map(dep => path.resolve(path.dirname(file), dep));
+        const deps = await getEsBuildDependencies(file);
         if (!esbuildDependencies.some(({ entry }) => entry === file))
             esbuildDependencies.push({
                 entry: file,
@@ -186,6 +186,15 @@ const watchHandler = async (entry) => {
     else {
         await watchEsbuild(entry);
     }
+};
+const getEsBuildDependencies = async (file) => {
+    const [, dir] = file.match(/(.*\/)(.*)$/);
+    file = (await fs.readdir(dir)).map(filename => `${dir}${filename}`).find(dirFile => dirFile.includes(file));
+    const dependencies = detective(file).map(dep => path.resolve(path.dirname(file), dep));
+    for (const dep of dependencies)
+        dependencies.push(...(await getEsBuildDependencies(dep)));
+    const uniqueDependencies = new Set(dependencies);
+    return Array.from(uniqueDependencies);
 };
 (async () => {
     var _a;

@@ -24,7 +24,7 @@
     "glob": "^7.2.3",
     "postcss": "^8.4.16",
     "postcss-inline-svg": "^5.0.0",
-    "precinct": "^8.3.1",
+    "precinct": "^9.0.1",
     "react": "^17.0.2",
     "sass": "^1.55.0",
     "ts-node": "^10.9.1",

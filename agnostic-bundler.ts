@@ -11,13 +11,14 @@ import * as autoprefixer from 'autoprefixer';
 import * as postcssInlineSvg from 'postcss-inline-svg';
 import * as browserSync from 'browser-sync';
 import { ESLint } from 'eslint';
+
 // @ts-ignore
 import * as precinct from 'precinct';
 import * as arg from 'arg'
 
-
 let state: 'build'|'watch'|'init' = 'init';
 const detective = precinct.paperwork;
+
 const args = arg({
   '--lint': Boolean,
   '--watch': Boolean,
@@ -111,7 +112,7 @@ const esbuildTask = async (entries: string[]) => {
   }
 
   for (const file of entries) {
-    const deps = (detective(file) as string[]).map(dep => path.resolve(path.dirname(file), dep));
+    const deps = await getEsBuildDependencies(file);
 
     if (!esbuildDependencies.some(({ entry }) => entry === file)) esbuildDependencies.push({
       entry: file,
@@ -235,6 +236,15 @@ const watchHandler = async (entry: string) => {
     await watchEsbuild(entry);
 
   }
+};
+
+const getEsBuildDependencies = async (file: string): Promise<string[]> => {
+  const [, dir] = file.match(/(.*\/)(.*)$/);
+  file = (await fs.readdir(dir)).map(filename => `${dir}${filename}`).find(dirFile => dirFile.includes(file));
+  const dependencies: string[] = (detective(file) as string[]).map(dep => path.resolve(path.dirname(file), dep));
+  for (const dep of dependencies) dependencies.push(...(await getEsBuildDependencies(dep)));
+  const uniqueDependencies = new Set(dependencies);
+  return Array.from(uniqueDependencies);
 };
 
 (async () => {
