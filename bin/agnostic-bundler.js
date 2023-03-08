@@ -190,7 +190,10 @@ const watchHandler = async (entry) => {
 const getEsBuildDependencies = async (file) => {
     const [, dir] = file.match(/(.*\/)(.*)$/);
     file = (await fs.readdir(dir)).map(filename => `${dir}${filename}`).find(dirFile => dirFile.includes(file));
-    const dependencies = detective(file).map(dep => path.resolve(path.dirname(file), dep));
+    if (!file)
+        return [];
+    const dependencies = detective(file)
+        .map(dep => path.resolve(path.dirname(file), dep));
     for (const dep of dependencies)
         dependencies.push(...(await getEsBuildDependencies(dep)));
     const uniqueDependencies = new Set(dependencies);
