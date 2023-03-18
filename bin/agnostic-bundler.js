@@ -189,6 +189,8 @@ const watchHandler = async (entry) => {
 };
 const getEsBuildDependencies = async (file) => {
     const [, dir] = file.match(/(.*\/)(.*)$/);
+    if (!await fs.pathExists(dir))
+        return [];
     file = (await fs.readdir(dir)).map(filename => `${dir}${filename}`).find(dirFile => dirFile.includes(file));
     if (!file)
         return [];

@@ -240,6 +240,7 @@ const watchHandler = async (entry: string) => {
 
 const getEsBuildDependencies = async (file: string): Promise<string[]> => {
   const [, dir] = file.match(/(.*\/)(.*)$/);
+  if (!await fs.pathExists(dir)) return [];
   file = (await fs.readdir(dir)).map(filename => `${dir}${filename}`).find(dirFile => dirFile.includes(file));
   if (!file) return [];
   const dependencies: string[] = (detective(file) as string[])
