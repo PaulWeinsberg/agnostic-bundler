@@ -1,41 +1,34 @@
 {
   "name": "@lorndev/agnostic-bundler",
   "version": "0.1.13",
-  "description": "A simple bundler for CMS which use simple assets stack",
+  "description": "A simple bundler for CMS or backend HTML frameworks to compile TS, JS, SCSS and CSS files.",
   "main": "bin/agnostic-bundler.js",
   "repository": "PaulWeinsberg/agnostic-bundler",
   "author": "Paul Weinsberg <p.weinsberg@icloud.com>",
   "license": "MIT",
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.59.0",
-    "@typescript-eslint/parser": "^5.59.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
     "arg": "^5.0.2",
-    "autoprefixer": "^10.4.12",
-    "browser-sync": "^2.27.10",
+    "autoprefixer": "^10.4.16",
+    "browser-sync": "^2.29.3",
     "colors": "^1.4.0",
-    "esbuild": "^0.14.54",
-    "eslint": "^8.38.0",
-    "eslint-plugin-import": "^2.26.0",
+    "esbuild": "^0.19.8",
+    "eslint": "^8.54.0",
+    "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.1",
-    "eslint-plugin-react": "^7.31.8",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-standard": "^5.0.0",
-    "fs-extra": "^10.1.0",
-    "glob": "^7.2.3",
-    "postcss": "^8.4.16",
-    "postcss-inline-svg": "^5.0.0",
-    "precinct": "^9.0.1",
-    "react": "^17.0.2",
-    "sass": "^1.55.0",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "postcss": "^8.4.31",
+    "postcss-inline-svg": "^6.0.0",
+    "precinct": "^11.0.5",
+    "react": "^18.2.0",
+    "sass": "^1.69.5",
     "ts-node": "^10.9.1",
-    "typescript": "^4.8.3"
-  },
-  "devDependencies": {
-    "@types/browser-sync": "^2.26.3",
-    "@types/eslint": "^8.37.0",
-    "@types/fs-extra": "^9.0.13",
-    "@types/glob": "^7.2.0",
-    "@types/postcss-inline-svg": "^5.0.0"
+    "typescript": "~5.1.0"
   },
   "scripts": {
     "build": "ts-node esbuild.ts --production",
@@ -43,5 +36,12 @@
   },
   "bin": {
     "agnostic-bundler": "./bin/agnostic-bundler.js"
+  },
+  "devDependencies": {
+    "@types/browser-sync": "^2.27.5",
+    "@types/eslint": "^8.44.7",
+    "@types/fs-extra": "^11.0.4",
+    "@types/glob": "^8.1.0",
+    "@types/postcss-inline-svg": "^5.0.3"
   }
 }
