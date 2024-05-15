@@ -1,6 +1,6 @@
 {
   "name": "@lorndev/agnostic-bundler",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A simple bundler for CMS or backend HTML frameworks to compile TS, JS, SCSS and CSS files.",
   "main": "bin/agnostic-bundler.js",
   "repository": "PaulWeinsberg/agnostic-bundler",
